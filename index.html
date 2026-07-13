@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Azeez Fit">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="manifest" href="./manifest.json">
+  <title>Azeez Fit AI - Halal Nutrition Coach</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <h1>Azeez Fit AI</h1>
+    <p>Halal nutrition and weight-loss coach</p>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showTab('home',this)">Home</button>
+    <button onclick="showTab('scan',this)">Scan</button>
+    <button onclick="showTab('meals',this)">Meals</button>
+    <button onclick="showTab('progress',this)">Progress</button>
+    <button onclick="showTab('more',this)">More</button>
+  </nav>
+
+  <main>
+    <div id="home" class="tab active">
+      <div class="card">
+        <label class="small">Latest weight</label>
+        <b id="latestWeight">80 kg</b>
+      </div>
+      <div class="grid">
+        <div class="card stat">
+          <div class="small">BMI</div>
+          <b id="bmi">29.4</b>
+        </div>
+        <div class="card stat">
+          <div class="small">Lost</div>
+          <b id="lost">0 kg</b>
+        </div>
+      </div>
+      <div class="card">
+        <div class="small" style="margin-bottom:8px">Remaining to 65 kg</div>
+        <div class="progress"><div id="bar" style="width:0%"></div></div>
+        <b id="remaining" style="display:block;margin-top:8px">15 kg</b>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Today</h3>
+        <div class="row">
+          <div>
+            <div class="small">Calories logged</div>
+            <b id="todayCalories" class="kcal">0 kcal</b>
+          </div>
+          <div>
+            <div class="small">Protein logged</div>
+            <b class="kcal" id="todayProtein">0 g</b>
+          </div>
+        </div>
+        <div class="chips">
+          <div class="chip">Target 1,600-1,900 kcal</div>
+          <div class="chip">Protein 90-110 g</div>
+          <div class="chip">8,000 steps</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Coach tip</h3>
+        <p class="small">At hawker centres, eat protein first, vegetables second, and rice or noodles last. Ask for less rice and less gravy.</p>
+      </div>
+    </div>
+
+    <div id="scan" class="tab">
+      <div class="card">
+        <h2 style="margin-top:0">Food photo</h2>
+        <p class="small">Take or upload a photo, then choose the closest food or enter an estimate.</p>
+        <label>Upload photo</label>
+        <input type="file" accept="image/*" onchange="previewPhoto(event)">
+        <img id="photoPreview" class="preview" alt="Food preview">
+        <p id="photoHint" class="small" style="margin-top:12px; color:#64748b"></p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Food name</h3>
+        <input type="text" id="estimateName" placeholder="e.g. Chicken rice with veg">
+        <label>Estimated calories</label>
+        <input type="number" id="estimateCalories" placeholder="0" min="0">
+        <label>Protein (g)</label>
+        <input type="number" id="estimateProtein" placeholder="0" min="0">
+        <button class="action" onclick="addEstimate()">Add estimate</button>
+        <p class="small notice" style="margin-top:12px">Photo calorie estimates are approximate. Oil, gravy, portion size and cooking method can change calories significantly.</p>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Barcode scanner</h3>
+        <button class="action secondary" onclick="scanBarcode()">Check barcode</button>
+        <button class="action warn" style="margin-top:8px" onclick="document.getElementById('barcodeForm').style.display='block'">Open camera scanner</button>
+        <div id="barcodeForm" style="display:none; margin-top:12px">
+          <label>Or enter barcode manually</label>
+          <input type="text" id="barcode" placeholder="13 or 12 digit code">
+          <button class="action secondary" onclick="lookupBarcode()">Look up</button>
+        </div>
+        <div id="barcodeResult" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div id="meals" class="tab">
+      <div class="card">
+        <h2 style="margin-top:0">Halal hawker calorie guide</h2>
+        <input type="text" id="foodSearch" placeholder="Search (e.g. chicken rice, roti prata)">
+        <div id="foodResults" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div id="progress" class="tab">
+      <div class="card">
+        <h2 style="margin-top:0">Food log</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Food</th>
+              <th>kcal</th>
+              <th>Protein</th>
+            </tr>
+          </thead>
+          <tbody id="foodLog">
+            <tr><td colspan="4">No food logged.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">Log progress</h2>
+        <label>Date</label>
+        <input type="date" id="wDate">
+        <label>Weight (kg)</label>
+        <input type="number" id="wWeight" step="0.1" placeholder="80">
+        <label>Waist (cm)</label>
+        <input type="number" id="wWaist" placeholder="100">
+        <label>Steps</label>
+        <input type="number" id="wSteps" placeholder="8000">
+        <button class="action" onclick="logWeight()">Save progress</button>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">History</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Weight</th>
+              <th>Waist</th>
+              <th>Steps</th>
+            </tr>
+          </thead>
+          <tbody id="history">
+            <tr><td colspan="4">No entries.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="more" class="tab">
+      <div class="card">
+        <h2 style="margin-top:0">Reminder preferences</h2>
+        <label>Time</label>
+        <input type="time" id="reminderTime" value="09:00">
+        <label>Reminder message</label>
+        <input type="text" id="reminderText" value="Log meals, water and weight">
+        <button class="action secondary" onclick="saveReminder()">Save reminder</button>
+        <p class="small notice" style="margin-top:12px">For actual iPhone notifications, add the app to Home Screen and enable notifications when prompted.</p>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">Backup</h2>
+        <button class="action secondary" onclick="exportCSV()">Export CSV</button>
+        <button class="action danger" style="margin-top:8px" onclick="clearAll()">Clear all data</button>
+        <p class="small notice" style="margin-top:12px">CSV exports your weight, waist, steps, and food log. Data stays in your browser unless you export it.</p>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0">Install on iPhone</h2>
+        <ol class="small">
+          <li>Open this page in <strong>Safari</strong></li>
+          <li>Tap <strong>Share</strong></li>
+          <li>Tap <strong>Add to Home Screen</strong></li>
+          <li>Tap <strong>Add</strong></li>
+        </ol>
+        <p class="small" style="margin-top:12px; font-style:italic">The app will work offline after the first load.</p>
+      </div>
+
+      <div class="card">
+        <p class="small notice">This app supports healthy tracking but does not replace a doctor or dietitian. Seek medical advice before using Ozempic, berberine or other weight-loss medication.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p><strong>Azeez Fit AI</strong> - Data stays in your browser unless you export it.</p>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
